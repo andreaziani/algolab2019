@@ -1,0 +1,22 @@
+{
+    "files.associations": {
+        "ios": "cpp",
+        "random": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "climits": "cpp",
+        "deque": "cpp",
+        "functional": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "vector": "cpp",
+        "*.tcc": "cpp",
+        "utility": "cpp",
+        "__split_buffer": "cpp",
+        "memory": "cpp"
+    }
+}

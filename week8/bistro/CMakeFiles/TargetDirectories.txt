@@ -1,0 +1,5 @@
+/Users/andrea/Documents/ETH/AlgorithmsLabs/week8/bistro/CMakeFiles/cgal_check_build_system.dir
+/Users/andrea/Documents/ETH/AlgorithmsLabs/week8/bistro/CMakeFiles/rebuild_cache.dir
+/Users/andrea/Documents/ETH/AlgorithmsLabs/week8/bistro/CMakeFiles/edit_cache.dir
+/Users/andrea/Documents/ETH/AlgorithmsLabs/week8/bistro/CMakeFiles/ALL_CGAL_TARGETS.dir
+/Users/andrea/Documents/ETH/AlgorithmsLabs/week8/bistro/CMakeFiles/main.dir

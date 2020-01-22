@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "algorithm": "cpp",
+        "memory": "cpp",
+        "utility": "cpp",
+        "vector": "cpp",
+        "__split_buffer": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "__tree": "cpp",
+        "map": "cpp",
+        "unordered_set": "cpp"
+    }
+}
