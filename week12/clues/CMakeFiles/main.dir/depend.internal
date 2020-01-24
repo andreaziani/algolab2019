@@ -1123,10 +1123,6 @@ CMakeFiles/main.dir/main.cpp.o
  /usr/local/include/boost/fusion/view/transform_view/transform_view_fwd.hpp
  /usr/local/include/boost/fusion/view/transform_view/transform_view_iterator.hpp
  /usr/local/include/boost/get_pointer.hpp
- /usr/local/include/boost/graph/graph_traits.hpp
- /usr/local/include/boost/graph/properties.hpp
- /usr/local/include/boost/graph/property_maps/constant_property_map.hpp
- /usr/local/include/boost/graph/property_maps/null_property_map.hpp
  /usr/local/include/boost/integer.hpp
  /usr/local/include/boost/integer/common_factor_ct.hpp
  /usr/local/include/boost/integer/common_factor_rt.hpp
@@ -1870,10 +1866,6 @@ CMakeFiles/main.dir/main.cpp.o
  /usr/local/include/boost/optional/optional.hpp
  /usr/local/include/boost/optional/optional_fwd.hpp
  /usr/local/include/boost/optional/optional_io.hpp
- /usr/local/include/boost/pending/detail/disjoint_sets.hpp
- /usr/local/include/boost/pending/detail/property.hpp
- /usr/local/include/boost/pending/disjoint_sets.hpp
- /usr/local/include/boost/pending/property.hpp
  /usr/local/include/boost/predef.h
  /usr/local/include/boost/predef/architecture.h
  /usr/local/include/boost/predef/architecture/alpha.h

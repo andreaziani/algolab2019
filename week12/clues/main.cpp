@@ -25,7 +25,7 @@ typedef Delaunay::Vertex_circulator vcirculator_t;
 
 using namespace std;
 
-bool try_coloring(int range, vector<K::Point_2> &stations, Delaunay &t){
+bool try_coloring(int range, Delaunay &t){
     Delaunay b, w;
 
     for(auto v = t.finite_vertices_begin(); v != t.finite_vertices_end(); v++){
@@ -94,7 +94,7 @@ int main(){
         
         Delaunay t;
         t.insert(stations.begin(), stations.end());
-        bool colorable = try_coloring(range, stations, t);
+        bool colorable = try_coloring(range, t);
 
         for(int i = 0; i < n_clues; i++){
             if(!colorable){
