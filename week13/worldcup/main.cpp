@@ -2,8 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <climits>
-#include <set>
-#include <tuple>
+#include <algorithm>
 #include <algorithm>
 #include <CGAL/QP_models.h>
 #include <CGAL/QP_functions.h>
@@ -18,7 +17,6 @@ typedef CGAL::Quadratic_program<IT> Program;
 typedef CGAL::Quadratic_program_solution<ET> Solution;
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 using namespace std;
-
 class ContourLine{
     public: long x, y, r;
 
@@ -75,64 +73,65 @@ class Warehouse {
 int main(){
     std::ios_base::sync_with_stdio(false);
     int t; cin >> t;
-
     while(t--){
-        int n, m, c;
-        cin >> n >> m >> c;
-        cout << fixed << setprecision(0);
-        vector<Warehouse> warehouses;
-        vector<Stadium> stadiums;
-        vector<ContourLine> lines;
-        for(int i = 0; i < n; i++){
+        int n_warehouse, n_stadium, n_cline;
+        cin >> n_warehouse >> n_stadium >> n_cline;
+        vector<Warehouse> w;
+        for(int i = 0; i < n_warehouse; i++){
             long x, y, s, a;
             cin >> x >> y >> s >> a;
-            warehouses.push_back(Warehouse(x, y, s, a));
+            w.emplace_back(x, y, s, a);
         }
 
-        for(int i = 0; i < m; i++){
-            long x, y, d, u;
-            cin >> x >> y >> d >> u;
-            stadiums.push_back(Stadium(x, y, d, u));
+        vector<Stadium> s;
+        for(int i = 0; i < n_stadium; i++){
+            long x, y, u, d;
+            cin >> x >> y >> u >> d;
+            s.emplace_back(x, y, u, d);
         }
 
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < m; j++){
-                int r; cin >> r;
-                warehouses[i].addReveneu(r);
+        for(int i = 0; i < n_warehouse; i++){
+            for(int j = 0; j < n_stadium; j++){
+                long r;
+                cin >> r;
+                w[i].addReveneu(r);
             }
         }
 
-        for(int i = 0 ; i < c; i++){
+        vector<ContourLine> l;
+        for(int i = 0; i < n_cline; i++){
             long x, y, r;
             cin >> x >> y >> r;
-            lines.push_back(ContourLine(x, y, r));
+            l.emplace_back(x, y, r);
         }
 
         bool found = false;
-        set<tuple<double,double,double>> used_c; 
-        for(int i = 0; i < n && !found; i++){
-            K::Point_2 w = K::Point_2(warehouses[i].x, warehouses[i].y);
-            for(int j = 0; j < c; j++){
-                if(CGAL::squared_distance(w, K::Point_2(lines[j].x, lines[j].y)) < (double) lines[j].r * lines[j].r){
-                    used_c.insert({lines[j].x, lines[j].y, lines[j].r});
-                    warehouses[i].addContourLine(lines[j]);
+        set<tuple<double,double,double>> used_cline;
+        
+        for(int i = 0; i < n_warehouse && !found; i++){
+            K::Point_2 p(w[i].x, w[i].y);
+            for(int j = 0; j < n_cline; j++){
+                K::Point_2 c(l[j].x, l[j].y);
+                if(CGAL::squared_distance(c, p) < (double) l[j].r * l[j].r){
+                    w[i].addContourLine(l[j]);
+                    used_cline.insert({l[j].x, l[j].y, l[j].r});
                 }
-                if(used_c.size() == 101) {
+                if(used_cline.size() == 101){
                     found = true;
                     break;
                 }
             }
-            
         }
 
-        for(int i = 0; i < m && !found; i++){
-            K::Point_2 w = K::Point_2(stadiums[i].x, stadiums[i].y);
-            for(int j = 0; j < c; j++){
-                if(CGAL::squared_distance(w, K::Point_2(lines[j].x, lines[j].y)) < (double) lines[j].r * lines[j].r){
-                    used_c.insert({lines[j].x, lines[j].y, lines[j].r});
-                    stadiums[i].addContourLine(lines[j]);
+        for(int i = 0; i < n_stadium && !found; i++){
+            K::Point_2 p(s[i].x, s[i].y);
+            for(int j = 0; j < n_cline; j++){
+                K::Point_2 c(l[j].x, l[j].y);
+                if(CGAL::squared_distance(c, p) < (double) l[j].r * l[j].r){
+                    s[i].addContourLine(l[j]);
+                    used_cline.insert({l[j].x, l[j].y, l[j].r});
                 }
-                if(used_c.size() == 101) {
+                if(used_cline.size() == 101){
                     found = true;
                     break;
                 }
@@ -140,82 +139,75 @@ int main(){
         }
 
         Program lp (CGAL::SMALLER, true, 0, false, 0); 
-        
-        int var_counter = 0;
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < m; j++){
-                set<tuple<double,double,double>> intersections; 
-                for(int c1 = 0; c1 < warehouses[i].contained.size(); c1++){
-                    intersections.insert({warehouses[i].contained[c1].x, warehouses[i].contained[c1].y, warehouses[i].contained[c1].r});
-                }
-                
-                for(int c2 = 0; c2 < stadiums[j].contained.size(); c2++){
-                    if(intersections.find({stadiums[j].contained[c2].x, stadiums[j].contained[c2].y, stadiums[j].contained[c2].r}) != intersections.end()){
-                        intersections.erase({stadiums[j].contained[c2].x, stadiums[j].contained[c2].y, stadiums[j].contained[c2].r});
-                    } else {
-                        intersections.insert({stadiums[j].contained[c2].x, stadiums[j].contained[c2].y, stadiums[j].contained[c2].r});
+
+        int variable = 0;
+        for(int i = 0; i < n_warehouse; i++){
+            for(int j = 0; j < n_stadium; j++){
+                set<tuple<double,double,double>> inters;
+                for(auto &c : w[i].contained)
+                    inters.insert({c.x, c.y, c.r});
+                for(auto &c : s[j].contained){
+                    if(inters.find({c.x, c.y, c.r}) != inters.end()){
+                        inters.erase({c.x, c.y, c.r});
+                    } else{
+                        inters.insert({c.x, c.y, c.r});
                     }
-
                 }
-
-                lp.set_c(var_counter, (double) -100.0 * warehouses[i].revenues[j] + intersections.size()); // MAX a(w,s) * r(w,s) - t(w,s)/100
-                var_counter++;
+                lp.set_c(variable, (double) -100.0 * w[i].revenues[j] + inters.size());
+                variable++;
             }
         }
 
-        int row_counter = 0;
-        var_counter = 0;
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < m; j++){
-                lp.set_a(var_counter, row_counter, 1); // sum[a(i, s)] <= supply(i)
-                var_counter++;
+        variable = 0;
+        int row = 0;
+        for(int i = 0; i < n_warehouse; i++){
+            for(int j = 0; j < n_stadium; j++){ 
+                lp.set_a(variable, row, 1); // sum[a(w,j)] <= liter per warehouse
+                variable++;
             }
-            lp.set_b(i, warehouses[i].s);
-            row_counter++;
+            lp.set_b(row, w[i].s);
+            row++;
         }
 
-        for(int j = 0; j < m; j++){
-            var_counter = j;
-            for(int i = 0; i < n; i++){
-                lp.set_a(var_counter, row_counter, 1); // sum[a(w, j)] <= demand(j)
-                var_counter += m;
+        for(int j = 0; j < n_stadium; j++){
+            variable = j;
+            for(int i = 0; i < n_warehouse; i++){
+                lp.set_a(variable, row, 1); // sum[a(w, j)] <= demand(j)
+                variable += n_stadium;
             }
-            lp.set_b(row_counter, stadiums[j].d);
-            row_counter++;
+            lp.set_b(row, s[j].d);
+            row++;
         }
 
+        for(int j = 0; j < n_stadium; j++){
+            variable = j;
+            for(int i = 0; i < n_warehouse; i++){
+                lp.set_a(variable, row, -1); // sum[a(w, j)] >= demand(j)
+                variable += n_stadium;
+            }
+            lp.set_b(row, -s[j].d);
+            row++;
+        }
+
+        for(int j = 0; j < n_stadium; j++){
+            variable = j;
+            for(int i = 0; i < n_warehouse; i++){
+                lp.set_a(variable, row, w[i].a); // sum[a(w, j) * alcool percentage] <= upper limit stadium
+                variable += n_stadium;
+            }
+            lp.set_b(row, 100.0 * s[j].u);
+            row++;
+        }
         
-        for(int j = 0; j < m; j++){
-            var_counter = j;
-            for(int i = 0; i < n; i++){
-                lp.set_a(var_counter, row_counter, -1); // -sum[a(w, j)] >= -demand(j)
-                var_counter += m;
-            }
-            lp.set_b(row_counter, -stadiums[j].d);
-            row_counter++;
-        }
-        
-
-        for(int j = 0; j < m; j++){
-            var_counter = j;
-            for(int i = 0; i < n; i++){
-                lp.set_a(var_counter, row_counter, warehouses[i].a);
-                var_counter += m;
-            }
-            lp.set_b(row_counter, 100.0 * stadiums[j].u);
-            row_counter++;
-        }
-
         // solve the program, using ET as the exact type
-        Solution s = CGAL::solve_linear_program(lp, ET());
-        assert(s.solves_linear_program(lp));
+        Solution sol = CGAL::solve_linear_program(lp, ET());
+        assert(sol.solves_linear_program(lp));
 
-        if (s.is_infeasible()) {
+        if (sol.is_infeasible()) {
             cout << "RIOT!\n";
         } else{
-            cout << floor(CGAL::to_double(-s.objective_value() / 100.0)) << "\n";
+            cout << floor(CGAL::to_double(-sol.objective_value() / 100.0)) << "\n";
         }
-        
     }
     return 0;
 }
