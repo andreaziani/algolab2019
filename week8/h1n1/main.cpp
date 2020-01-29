@@ -34,7 +34,7 @@ int main(){
         Triangulation t;
         t.insert(p.begin(), p.end());
         
-        priority_queue<face_handle, vector<face_handle>, less<face_handle>> min_heap;
+        priority_queue<face_handle> max_heap;
         for(auto it = t.all_faces_begin(); it != t.all_faces_end(); it++){
             if(t.is_infinite(it)){
                 it->info() = -1; // because one escapee can be already on an infinite face
@@ -46,13 +46,13 @@ int main(){
             for(int i = 0; i < 3; i++){
                 auto f = it->neighbor(i);
                 if(!t.is_infinite(f))
-                    min_heap.push({t.segment(it, i).squared_length(), f});
+                    max_heap.push({t.segment(it, i).squared_length(), f});
             }
         }
 
-        while(!min_heap.empty()){
-            auto v = min_heap.top();
-            min_heap.pop();
+        while(!max_heap.empty()){
+            auto v = max_heap.top();
+            max_heap.pop();
             auto curr_f = v.second;
             auto dist = v.first;
             if(curr_f->info() != 0) // already visited
@@ -63,7 +63,7 @@ int main(){
                 auto neighbor_face = curr_f->neighbor(i);
                 if(!t.is_infinite(neighbor_face) && neighbor_face->info() == 0){ //not infinite and not visited
                     K::FT minimum_dist = min(t.segment(curr_f, i).squared_length(), dist);
-                    min_heap.push({minimum_dist, neighbor_face});
+                    max_heap.push({minimum_dist, neighbor_face});
                 }
             }
         }
